@@ -181,6 +181,20 @@ print("Accuracy = %g" % accuracy)
 
 In [13]
 ```python
+from pyspark.mllib.evaluation import BinaryClassificationMetrics as metric
+results = predictions.select(['probability', 'label'])
+ 
+## prepare score-label set
+results_collect = results.collect()
+results_list = [(float(i[0][0]), 1.0-float(i[1])) for i in results_collect]
+scoreAndLabels = sc.parallelize(results_list)
+ 
+metrics = metric(scoreAndLabels)
+print("The ROC score is: ", metrics.areaUnderROC)
+```
+
+In [14]
+```python
 # Create an unseen instance of weather conditions.
 new_data = [{'Outlook': 'rain', 'Temperature': 'hot', 'Humidity': 'normal', 'Wind': 'strong'}]
 
@@ -188,7 +202,7 @@ new_df = sqlContext.createDataFrame(new_data)
 new_df.show()
 ```
 
-In [14]
+In [15]
 ```python
 # Make a new prediction on the unseen instance.
 new_predictions = model_dt.transform(new_df)
@@ -358,6 +372,8 @@ Out [12]:
 
 
 ## Exercise 5: Automating algnorthm selection using CADS (IBM Cognitive Assistant for Data Scientists)
+
+Heads up: This exercise is currently not working for unknown reasons! I would recommend not implementing this exercise, unless you know how it works and how to solve the issue.
 
 1) Open notebook "Play Tennis" in edit mode
 
